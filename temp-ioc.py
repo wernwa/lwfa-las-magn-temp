@@ -6,8 +6,13 @@ import thread
 import serial
 import sys
 from setup import *
+import epics
+import time
+from termcolor import colored
+
 
 alive=True
+demag_pv = epics.PV('shicane:demag')
 prefix = 'shicane:'
 pvdb={
     'temp_all' : {
@@ -52,6 +57,8 @@ class myDriver(Driver):
             tempcnt_prev2=tempcnt_prev
 
 
+        self.trigger_demag_active=False
+
         #t_arr = line.split(' ')
         tempcnt = len(t_arr)-1
         print '%d temperature sensors recognized'%tempcnt
@@ -88,12 +95,34 @@ class myDriver(Driver):
                 if (len(t_arr)!=tempcnt+1):
                     continue
 
+                start_demag=False
+
                 for i in range(0,tempcnt):
-                    self.setParam(record_list[i],t_arr[i])
+                    t = float(t_arr[i])
+                    if t>cycle_temperature: 
+                        start_demag=True
+                        print colored('critical temperature of %.2f degree reached for %s'%(t,record_list[i]), 'red')
+                    self.setParam(record_list[i],t)
+                
+                if start_demag==True: 
+                    self.trigger_demag()
+
                 self.updatePVs()
             except Exception as e:
                 print 'Err:',e
                 alive=False
+
+    def trigger_demag(self):
+        
+        def trigger():
+            self.trigger_demag_active=True
+            print 'triggering the cycling for all magnets'
+            demag_pv.put(1)
+            time.sleep(1)
+            self.trigger_demag_active=False
+        
+        if self.trigger_demag_active==False:
+            thread.start_new_thread(trigger,())
 
 if __name__ == '__main__':
 

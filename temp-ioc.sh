@@ -6,7 +6,7 @@ export EPICS_CA_REPEATER_PORT=5065
 
 if [ "$1" == "start" ]
 then
-    ./temp-ioc.py &
+    ./temp-ioc.py
 elif [ "$1" == "stop" ]
 then
     
