@@ -3,9 +3,8 @@
 import os, sys
 import re
 from setup import *
+import time
 
-#boud=115200
-#arduino_dev='/dev/ttyACM0'
 
 
 #usb_out = os.system('lsusb')
@@ -27,8 +26,13 @@ else:
     else:
         dev_nr=m.group(1)
         print 'resetting device NR',dev_nr
+        os.system('sudo rm %s'%tty_driver) # remove driver in dev bevore reinit
+        #os.system('sudo sh -c \'echo 0 > /sys/bus/usb/devices/%s/authorized\''%dev_nr)
         os.system('sudo sh -c \'echo "%s" > /sys/bus/usb/drivers/usb/unbind\''%dev_nr)
+        time.sleep(0.5)
         os.system('sudo sh -c \'echo "%s" > /sys/bus/usb/drivers/usb/bind\''%dev_nr)
+        time.sleep(0.5)
+        #os.system('sudo sh -c \'echo 1 > /sys/bus/usb/devices/%s/authorized\''%dev_nr)
         os.system('sudo stty -F %s %s'%(tty_driver,baud))
 
 

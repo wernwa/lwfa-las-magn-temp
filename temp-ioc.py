@@ -19,7 +19,10 @@ pvdb={
         'type' : 'char',
         'count' : 100,
         'unit' : 'C',
-    }
+    },
+    'zps:switchbox' : {
+        'type' : 'int',
+    },
 }
 for name in ['q1','q2','q3','q4','q5','q6','q7','d1','d2']:
     pvdb['%s:temp'%name] = {
@@ -31,6 +34,9 @@ for name in ['q1','q2','q3','q4','q5','q6','q7','d1','d2']:
             'asg'  : 'readonly',
         }
 tempcnt = 7
+
+
+ser_lock = thread.allocate_lock()
 
 class myDriver(Driver):
     def  __init__(self):
@@ -71,10 +77,22 @@ class myDriver(Driver):
         self.tid = thread.start_new_thread(self.read_tty,())
 
     def read(self, reason):
-        #if reason == 'RAND':
-        #    value = random.random()
-        #else:
-        value = self.getParam(reason)
+
+        # read the power status of the magnets
+        if reason=='zps:switchbox':
+            value = 99
+            ser_lock.acquire()
+            self.ser.write(chr(2))
+            line = self.ser.readline()
+            ser_lock.release()
+            arr = line.split()
+            if arr[0]=='zps:switchbox':
+                #print 'status: %s'%arr[1]
+                if arr[1]=='0': value=0
+                elif arr[1]=='1': value=1
+        else:
+            value = self.getParam(reason)
+
         return value
 
 
@@ -92,7 +110,9 @@ class myDriver(Driver):
             try:
                 line=''
                 try:
+                    ser_lock.acquire()
                     line = self.ser.readline()
+                    ser_lock.release()
                 except Exception as e:
                     #print e.strerror
                     line = 'None '*tempcnt+'\n'
@@ -138,6 +158,30 @@ class myDriver(Driver):
 
         if self.trigger_demag_active==False:
             thread.start_new_thread(trigger,())
+
+
+
+    def write(self, reason, value):
+        status = False
+        # turn the power of the powersupplies on/off
+        if reason == 'zps:switchbox':
+            print 'zps:switchbox',value
+            ser_lock.acquire()
+            if value==1:
+                self.ser.write(chr(1))
+            elif value==0:
+                self.ser.write(chr(0))
+            ser_lock.release()
+
+            status = True
+            # store the value and this also resets alarm status and severity for string type
+            self.setParam(reason, value)
+        else:
+            status = True
+            # store the value and this also resets alarm status and severity for string type
+            self.setParam(reason, value)
+
+        return status
 
 if __name__ == '__main__':
 
