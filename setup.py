@@ -1,6 +1,6 @@
 
-cycle_temperature = 95.0
-tty_driver = '/dev/pts/8'
+cycle_temperature = 80.0
+tty_driver = '/dev/pts/9'
 #tty_driver = '/dev/ttyACM0'
 baud = 115200
 serial_timeout = 1 # sec

@@ -16,16 +16,16 @@ import time
 # the second is for reading (setup.py)
 
 try:
-    pty_nr=sys.argv[1] # get the pty number from command line
+    pty_nr=int(sys.argv[1]) # get the pty number from command line
 except IndexError:
     print 'usage: %s <ptynr>'%sys.argv[0]
     sys.exit(-1)
 
 
-s = serial.Serial('/dev/pts/3')
+s = serial.Serial('/dev/pts/%d'%pty_nr)
 
 #temp=[0,0,0,0,0,0,0,0,0]
-temp=[88,88,88,88,88,88,88,88,88]
+temp=[75,75,75,75,75,75,75,75,75]
 
 while True:
     line = ''
