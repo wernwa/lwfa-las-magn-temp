@@ -9,7 +9,7 @@ from setup import *
 import epics
 import time
 from termcolor import colored
-
+import traceback
 
 alive=True
 demag_pv = epics.PV('chicane:demag')
@@ -40,7 +40,7 @@ class myDriver(Driver):
         try:
             self.ser = serial.Serial(tty_driver, baud, timeout=serial_timeout)
         except Exception as e:
-            print e
+            print traceback.format_exc()
             sys.exit(-1)
 
         # throw first lines away (i.a. not from the start)
@@ -77,40 +77,51 @@ class myDriver(Driver):
 
     def read_tty(self):
 
-        global alive, tempcnt
+        global alive, tempcnt, name_to_index
         record_list=['q1:temp','q2:temp','q3:temp','q4:temp','q5:temp','q6:temp','q7:temp','d1:temp','d2:temp']
+
+        index_rearanged = [99,99,99,99,99,99,99,99,99]
+        for i in range(0,tempcnt):
+            index_rearanged[i] = name_to_index[record_list[i]]
+
 
         while alive:
             try:
                 line=''
                 try:
                     line = self.ser.readline()
-                except SerialException as e:
-                    print e.strerror
+                except Exception as e:
+                    #print e.strerror
                     line = 'None '*tempcnt+'\n'
-                self.setParam('temp_all',line)
-                #print line
+                    print traceback.format_exc()
                 t_arr = line.split(' ')
                 #print t_arr
                 if (len(t_arr)!=tempcnt+1):
                     continue
 
                 start_demag=False
-
+                line = ''
                 for i in range(0,tempcnt):
-                    t = float(t_arr[i])
+                    rear_i = index_rearanged[i]
+                    t_str = t_arr[rear_i]
+                    t = float(t_str)
+                    line += t_str+' '
                     if t>cycle_temperature:
                         start_demag=True
-                        print colored('critical temperature of %.2f degree reached for %s'%(t,record_list[i]), 'red')
-                    self.setParam(record_list[i],t)
+                        print colored('critical temperature of %.2f degree reached for %s'%(t,record_list[rear_i]), 'red')
+                    self.setParam(record_list[rear_i],t)
+                
+                #print line
+                self.setParam('temp_all',line)
 
                 if start_demag==True:
                     self.trigger_demag()
 
                 self.updatePVs()
             except Exception as e:
-                print 'Err:',e
+                #print 'Err:',e
                 alive=False
+                print traceback.format_exc()
 
     def trigger_demag(self):
 
