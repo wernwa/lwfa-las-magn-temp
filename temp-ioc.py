@@ -1,56 +1,57 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 from pcaspy import Driver, SimpleServer, Severity
 import random
 import thread
 import serial
 
-prefix = 'SHICANE:'
+prefix = 'shicane:'
 pvdb = {
-    'RAND' : {
+#    'RAND' : {
+#        'prec' : 3,
+#        'scan' : 1,
+#    },
+    'q1:temp' : {
         'prec' : 3,
-        'scan' : 1,
+	'unit' : 'C',
+#        'low' : -20, 'high': 70,
+        'lolo': -30,'hihi': 99,
     },
-    'M1:T' : {
+    'q2:temp' : {
         'prec' : 3,
         'low' : -20, 'high': 70,
         'lolo': -30,'hihi': 99,
     },
-    'M2:T' : {
+    'q3:temp' : {
         'prec' : 3,
         'low' : -20, 'high': 70,
         'lolo': -30,'hihi': 99,
     },
-    'M3:T' : {
+    'q4:temp' : {
         'prec' : 3,
         'low' : -20, 'high': 70,
         'lolo': -30,'hihi': 99,
     },
-    'M4:T' : {
+    'q5:temp' : {
         'prec' : 3,
         'low' : -20, 'high': 70,
         'lolo': -30,'hihi': 99,
     },
-    'M5:T' : {
+    'q6:temp' : {
         'prec' : 3,
         'low' : -20, 'high': 70,
         'lolo': -30,'hihi': 99,
     },
-    'M6:T' : {
+    'q7:temp' : {
         'prec' : 3,
         'low' : -20, 'high': 70,
         'lolo': -30,'hihi': 99,
     },
-    'M7:T' : {
-        'prec' : 3,
-        'low' : -20, 'high': 70,
-        'lolo': -30,'hihi': 99,
-    },
-    'STATUS' : {
-        'type' : 'enum',
-        'enums':  ['OK', 'ERROR'],
-        'states': [Severity.NO_ALARM, Severity.MAJOR_ALARM]
-    },
+#    'STATUS' : {
+#        'type' : 'enum',
+#        'enums':  ['OK', 'ERROR'],
+#        'states': [Severity.NO_ALARM, Severity.MAJOR_ALARM]
+#    },
 }
 tempcnt = 7
 
@@ -72,17 +73,18 @@ class myDriver(Driver):
         global tempcnt
         while True:
             line = self.ser.readline()
+	    #print line
             t_arr = line.split(' ')
             if (len(t_arr)!=tempcnt+1):
                 continue
             #print t_arr
-            self.setParam('M1:T', t_arr[0])
-            self.setParam('M2:T', t_arr[1])
-            self.setParam('M3:T', t_arr[2])
-            self.setParam('M4:T', t_arr[3])
-            self.setParam('M5:T', t_arr[4])
-            self.setParam('M6:T', t_arr[5])
-            self.setParam('M7:T', t_arr[6])
+            self.setParam('q1:temp', t_arr[0])
+            self.setParam('q2:temp', t_arr[1])
+            self.setParam('q3:temp', t_arr[2])
+            self.setParam('q4:temp', t_arr[3])
+            self.setParam('q5:temp', t_arr[4])
+            self.setParam('q6:temp', t_arr[5])
+            self.setParam('q7:temp', t_arr[6])
             self.updatePVs()
 
 if __name__ == '__main__':
