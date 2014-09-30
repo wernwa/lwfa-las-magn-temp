@@ -4,6 +4,7 @@ from pcaspy import Driver, SimpleServer, Severity
 import random
 import thread
 import serial
+import sys
 
 prefix = 'shicane:'
 pvdb = {
@@ -59,8 +60,29 @@ class myDriver(Driver):
     def  __init__(self):
         super(myDriver, self).__init__()
         self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-        self.tid = thread.start_new_thread(self.read_tty,())
 
+	# throw first lines away (i.a. not from the start)
+	const=False
+	tempcnt_prev=0
+	tempcnt_prev2=0
+	while const==False:
+		line = self.ser.readline()
+		sys.stdout.write(line)
+		t_arr = line.split(' ')
+		tempcnt = len(t_arr)-1
+		if tempcnt == tempcnt_prev and tempcnt==tempcnt_prev2: const=True
+		tempcnt_prev=tempcnt
+		tempcnt_prev2=tempcnt_prev
+
+	
+	#t_arr = line.split(' ')
+	#tempcnt = len(t_arr)-1
+	print '%d temperature sensors recognized'%tempcnt
+	
+        self.tid = thread.start_new_thread(self.read_tty,())
+	print '------------------------------'
+	print 'Start polling (CTRL+C -> end).'
+	print '------------------------------'
 
     def read(self, reason):
         if reason == 'RAND':
@@ -96,3 +118,9 @@ if __name__ == '__main__':
     while True:
         server.process(0.1)
 
+    while True:
+		try:
+			server.process(0.1)
+		except KeyboardInterrupt:
+			print " Bye"
+			sys.exit()
