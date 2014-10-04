@@ -8,7 +8,13 @@ import sys
 
 
 prefix = 'shicane:'
-pvdb={}
+pvdb={
+	'temp_all' : {
+		'type' : 'char',
+		'count' : 100,
+		'unit' : 'C',
+	}
+}
 for name in ['q1','q2','q3','q4','q5','q6','q7','d1','d2']:
 	pvdb['%s:temp'%name] = {
 			'prec' : 2,
@@ -60,7 +66,13 @@ class myDriver(Driver):
  		record_list=['q1:temp','q2:temp','q3:temp','q4:temp','q5:temp','q6:temp','q7:temp','d1:temp','d2:temp']
 
 		while True:
-			line = self.ser.readline()
+			line=''
+			try:
+				line = self.ser.readline()
+			except SerialException as e:
+				print e.strerror
+				line = 'None '*tempcnt+'\n'
+			self.setParam('temp_all',line)
 			#print line
 			t_arr = line.split(' ')
 			#print t_arr
