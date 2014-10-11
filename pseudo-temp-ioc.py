@@ -5,7 +5,7 @@ import random
 import thread
 import serial
 import sys
-
+import time
 
 prefix = 'shicane:'
 pvdb={
@@ -24,38 +24,18 @@ for name in ['q1','q2','q3','q4','q5','q6','q7','d1','d2']:
             'lolim': -30, 'hilim': 100,
             'asg'  : 'readonly',
         }
-tempcnt = 7
+tempcnt = 9
 
 class myDriver(Driver):
     def  __init__(self):
         global tempcnt
         super(myDriver, self).__init__()
 
-        try:
-            self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-        except Exception as e:
-            print e
-            sys.exit(-1)
-
-        # throw first lines away (i.a. not from the start)
-        const=False
-        tempcnt_prev=0
-        tempcnt_prev2=0
-        while const==False:
-            line = self.ser.readline()
-            sys.stdout.write(line)
-            t_arr = line.split(' ')
-            tempcnt = len(t_arr)-1
-            if tempcnt == tempcnt_prev and tempcnt==tempcnt_prev2: const=True
-            tempcnt_prev=tempcnt
-            tempcnt_prev2=tempcnt_prev
-
 
         #t_arr = line.split(' ')
-        tempcnt = len(t_arr)-1
         print '%d temperature sensors recognized'%tempcnt
         print '------------------------------'
-        print ' Start polling (CTRL+C -> end).'
+        print ' Pseudo temperature ioc, Start polling (CTRL+C -> end).'
         print '------------------------------'
         self.tid = thread.start_new_thread(self.read_tty,())
 
@@ -71,14 +51,15 @@ class myDriver(Driver):
 
         global tempcnt
         record_list=['q1:temp','q2:temp','q3:temp','q4:temp','q5:temp','q6:temp','q7:temp','d1:temp','d2:temp']
+        def rt(prev_q_index):
+            prev = float(self.getParam('%s'%record_list[prev_q_index]))
+            s=random.randint(0,1)
+            if s==0: sign=-1
+            else: sign=1
+            return prev + sign*random.random()
 
         while True:
-            line=''
-            try:
-                line = self.ser.readline()
-            except SerialException as e:
-                print e.strerror
-                line = 'None '*tempcnt+'\n'
+            line='%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f \n'%(rt(0),rt(1),rt(2),rt(3),rt(4),rt(5),rt(6),rt(7),rt(8))
             self.setParam('temp_all',line)
             #print line
             t_arr = line.split(' ')
@@ -88,7 +69,9 @@ class myDriver(Driver):
 
             for i in range(0,tempcnt):
                 self.setParam(record_list[i],t_arr[i])
+
             self.updatePVs()
+            time.sleep(0.5)
 
 if __name__ == '__main__':
 
