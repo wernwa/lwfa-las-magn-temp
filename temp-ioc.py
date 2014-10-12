@@ -6,7 +6,7 @@ import thread
 import serial
 import sys
 
-
+alive=True
 prefix = 'shicane:'
 pvdb={
     'temp_all' : {
@@ -69,26 +69,30 @@ class myDriver(Driver):
 
     def read_tty(self):
 
-        global tempcnt
+        global alive, tempcnt
         record_list=['q1:temp','q2:temp','q3:temp','q4:temp','q5:temp','q6:temp','q7:temp','d1:temp','d2:temp']
 
-        while True:
-            line=''
+        while alive:
             try:
-                line = self.ser.readline()
-            except SerialException as e:
-                print e.strerror
-                line = 'None '*tempcnt+'\n'
-            self.setParam('temp_all',line)
-            #print line
-            t_arr = line.split(' ')
-            #print t_arr
-            if (len(t_arr)!=tempcnt+1):
-                continue
+                line=''
+                try:
+                    line = self.ser.readline()
+                except SerialException as e:
+                    print e.strerror
+                    line = 'None '*tempcnt+'\n'
+                self.setParam('temp_all',line)
+                #print line
+                t_arr = line.split(' ')
+                #print t_arr
+                if (len(t_arr)!=tempcnt+1):
+                    continue
 
-            for i in range(0,tempcnt):
-                self.setParam(record_list[i],t_arr[i])
-            self.updatePVs()
+                for i in range(0,tempcnt):
+                    self.setParam(record_list[i],t_arr[i])
+                self.updatePVs()
+            except Exception as e:
+                print 'Err:',e
+                alive=False
 
 if __name__ == '__main__':
 
@@ -99,7 +103,7 @@ if __name__ == '__main__':
     driver = myDriver()
 
     # process CA transactions
-    while True:
+    while alive:
         try:
             server.process(0.1)
         except KeyboardInterrupt:
