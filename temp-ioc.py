@@ -5,6 +5,7 @@ import random
 import thread
 import serial
 import sys
+from setup import *
 
 alive=True
 prefix = 'shicane:'
@@ -32,7 +33,7 @@ class myDriver(Driver):
         super(myDriver, self).__init__()
 
         try:
-            self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+            self.ser = serial.Serial(tty_driver, baud, timeout=serial_timeout)
         except Exception as e:
             print e
             sys.exit(-1)
