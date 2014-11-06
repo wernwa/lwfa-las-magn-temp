@@ -12,8 +12,8 @@ from termcolor import colored
 
 
 alive=True
-demag_pv = epics.PV('shicane:demag')
-prefix = 'shicane:'
+demag_pv = epics.PV('chicane:demag')
+prefix = 'chicane:'
 pvdb={
     'temp_all' : {
         'type' : 'char',

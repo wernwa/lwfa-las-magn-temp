@@ -7,7 +7,7 @@ import serial
 import sys
 import time
 
-prefix = 'shicane:'
+prefix = 'chicane:'
 pvdb={
     'temp_all' : {
         'type' : 'char',
