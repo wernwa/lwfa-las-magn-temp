@@ -24,13 +24,13 @@ except IndexError:
 
 s = serial.Serial('/dev/pts/%d'%pty_nr)
 
-#temp=[0,0,0,0,0,0,0,0,0]
-temp=[75,75,75,75,75,75,75,75,75]
+temp=[0,0,0,0,0,0,0,0,0]
+#temp=[75,75,75,75,75,75,75,75,75]
 
 while True:
     line = ''
     for i in range(0,len(temp)):
-        if random.random()>0.5: sign=1 
+        if random.random()>0.5: sign=1
         else: sign=-1
         temp[i]=temp[i]+sign*random.random()
         line+='%.2f '%temp[i]
