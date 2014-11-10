@@ -99,12 +99,12 @@ class myDriver(Driver):
 
                 for i in range(0,tempcnt):
                     t = float(t_arr[i])
-                    if t>cycle_temperature: 
+                    if t>cycle_temperature:
                         start_demag=True
                         print colored('critical temperature of %.2f degree reached for %s'%(t,record_list[i]), 'red')
                     self.setParam(record_list[i],t)
-                
-                if start_demag==True: 
+
+                if start_demag==True:
                     self.trigger_demag()
 
                 self.updatePVs()
@@ -113,14 +113,14 @@ class myDriver(Driver):
                 alive=False
 
     def trigger_demag(self):
-        
+
         def trigger():
             self.trigger_demag_active=True
             print 'triggering the cycling for all magnets'
             demag_pv.put(1)
-            time.sleep(1)
+            time.sleep(15)
             self.trigger_demag_active=False
-        
+
         if self.trigger_demag_active==False:
             thread.start_new_thread(trigger,())
 
