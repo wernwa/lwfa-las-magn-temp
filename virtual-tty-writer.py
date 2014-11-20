@@ -61,7 +61,7 @@ while True:
         elif temp[i]>20: entropy=-1
         else: entropy=0
         temp[i]=temp[i]+random.random()*0.2*entropy+random.random()*sign*0.1+curr[i]/curr_max
-        #if i==0: temp[i]-=200   # test rearange
+        if i==0: temp[i]-=200   # test rearange
         line+='%.2f '%temp[i]
     line+='\n'
     s.write(line)

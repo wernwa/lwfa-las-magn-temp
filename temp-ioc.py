@@ -82,7 +82,7 @@ class myDriver(Driver):
 
         index_rearanged = [99,99,99,99,99,99,99,99,99]
         for i in range(0,tempcnt):
-            index_rearanged[i] = name_to_index[record_list[i]]
+            index_rearanged[i] = name_to_index[record_list[i]]-1
 
 
         while alive:
@@ -108,9 +108,10 @@ class myDriver(Driver):
                     line += t_str+' '
                     if t>cycle_temperature:
                         start_demag=True
-                        print colored('critical temperature of %.2f degree reached for %s'%(t,record_list[rear_i]), 'red')
-                    self.setParam(record_list[rear_i],t)
-                
+                        print colored('critical temperature of %.2f degree reached for %s'%(t,record_list[i]), 'red')
+                    self.setParam(record_list[i],t)
+                    #if i==0: print i,rear_i,record_list[i],t
+
                 #print line
                 self.setParam('temp_all',line)
 
