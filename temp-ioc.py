@@ -61,6 +61,9 @@ class myDriver(Driver):
 
         #t_arr = line.split(' ')
         tempcnt = len(t_arr)-1
+        if tempcnt==0:
+            print colored('Err:','red'),'no numbers for the temperature recognized. exiting'
+            sys.exit(-1)
         print '%d temperature sensors recognized'%tempcnt
         print '------------------------------'
         print ' Start polling (CTRL+C -> end).'
