@@ -39,7 +39,10 @@ def onPVChanges(pvname=None, value=None, timestamp=None, **kw):
     arr = value.tostring().split(' ')
     try:
         for i in range(0,len(curr)):
-            curr[i] = abs(float(arr[i]))
+            try:
+                curr[i] = abs(float(arr[i]))
+            except:
+                curr[i] = 0
 
     except Exception as e:
         print traceback.format_exc()
@@ -61,7 +64,7 @@ while True:
         elif temp[i]>20: entropy=-1
         else: entropy=0
         temp[i]=temp[i]+random.random()*0.2*entropy+random.random()*sign*0.1+curr[i]/curr_max
-        if i==0: temp[i]-=200   # test rearange
+        #if i==0: temp[i]-=200   # test rearange
         line+='%.2f '%temp[i]
     line+='\n'
     s.write(line)
