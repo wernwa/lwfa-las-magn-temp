@@ -9,11 +9,11 @@
   written by Ronny Große ronny.grosse@uni-jena.de
           and Walter Werner wernwa@gmail.com
           
-  last Change 08.12.2014 by Walter Werner
+  last Change 11.12.2014 by Ronny Große
  */
 
 float temperature[9];
-byte Portpin[] = {A0, A1, A2, A3, A4, A5, A6, A7, B0};
+byte Portpin[] = {A0, A1, A2, A3, A4, A5, A6, A7, A8};
 int cnt=9;
 
 float critical_temp=100.0;
