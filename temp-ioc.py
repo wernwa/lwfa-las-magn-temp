@@ -38,6 +38,13 @@ tempcnt = 7
 
 ser_lock = thread.allocate_lock()
 
+def handle_epics_ca_messages(text):
+    #print(" Saw CA Message: %s\n" % text)
+    with open("ca_error.log", "a") as cafile:
+        cafile.write(text)
+
+epics.ca.replace_printf_handler(handle_epics_ca_messages)
+
 class myDriver(Driver):
     def  __init__(self):
         global tempcnt
