@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export EPICS_CA_SERVER_PORT=5064
-export EPICS_CA_REPEATER_PORT=5065
+export EPICS_CA_SERVER_PORT=20002
+export EPICS_CA_REPEATER_PORT=20003
 
 
 if [ "$1" == "start" ]
