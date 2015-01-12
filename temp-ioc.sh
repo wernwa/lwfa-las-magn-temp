@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#
+#   set the two variables to free ports
+#
 export EPICS_CA_SERVER_PORT=20002
 export EPICS_CA_REPEATER_PORT=20003
 

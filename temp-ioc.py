@@ -1,4 +1,9 @@
 #!/usr/bin/python
+#
+#   temperature ioc server/driver for the magnets read out from the  arduino board
+#
+#   Author: Walter Werner
+#   email: wernwa@gmail.com
 
 from pcaspy import Driver, SimpleServer, Severity
 import random
@@ -11,8 +16,12 @@ import time
 from termcolor import colored
 import traceback
 
-alive=True
+alive=True      # helper variable for the polling thread
 demag_pv = epics.PV('chicane:demag')
+
+#
+#   Database definitions
+#
 prefix = 'chicane:'
 pvdb={
     'temp_all' : {
@@ -38,14 +47,22 @@ tempcnt = 7
 
 ser_lock = thread.allocate_lock()
 
+
+# avoid disonnection messages/exceptions on the command line from underlying ca
+# epics
 def handle_epics_ca_messages(text):
     #print(" Saw CA Message: %s\n" % text)
     with open("ca_error.log", "a") as cafile:
         cafile.write(text)
-
 epics.ca.replace_printf_handler(handle_epics_ca_messages)
 
+##
+##  The Temperature IOC Driver class
+##
 class myDriver(Driver):
+    #
+    #   Constructor
+    #
     def  __init__(self):
         global tempcnt
         super(myDriver, self).__init__()
@@ -83,6 +100,9 @@ class myDriver(Driver):
         print '------------------------------'
         self.tid = thread.start_new_thread(self.read_tty,())
 
+    #
+    #   read method, called when user pv read requests
+    #
     def read(self, reason):
 
         # read the power status of the magnets
@@ -102,7 +122,9 @@ class myDriver(Driver):
 
         return value
 
-
+    #
+    #   thread method for continues polling
+    #
     def read_tty(self):
 
         global alive, tempcnt, name_to_index
@@ -154,6 +176,9 @@ class myDriver(Driver):
                 alive=False
                 print traceback.format_exc()
 
+    #
+    #   trigger cycling to the zps-ioc server
+    #
     def trigger_demag(self):
 
         def trigger():
@@ -167,7 +192,9 @@ class myDriver(Driver):
             thread.start_new_thread(trigger,())
 
 
-
+    #
+    #   write method, called if user wants to change a variable
+    #
     def write(self, reason, value):
         status = False
         # turn the power of the powersupplies on/off
@@ -190,6 +217,9 @@ class myDriver(Driver):
 
         return status
 
+#
+#   main function
+#
 if __name__ == '__main__':
 
 

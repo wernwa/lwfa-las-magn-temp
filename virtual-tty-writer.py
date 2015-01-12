@@ -1,4 +1,8 @@
 #!/usr/bin/python
+#
+#   writes temperature (as random values) to a virtual tty
+#   start socat as described below and change setup.py and this file
+#   to the right /dev/... driver name
 import sys
 import serial
 import random
@@ -12,7 +16,6 @@ import traceback
 # system call to socat:
 #
 # socat -d -d pty,raw,echo=1 pty,raw,echo=1
-# socat -d -d pty pty
 #2000/01/03 12:20:52 socat[2185] N PTY is /dev/pts/3
 #2000/01/03 12:20:52 socat[2185] N PTY is /dev/pts/9
 #2000/01/03 12:20:52 socat[2185] N starting data transfer loop with FDs [3,3] and [5,5]
